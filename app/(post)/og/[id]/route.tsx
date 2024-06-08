@@ -47,10 +47,10 @@ export async function GET(_req: Request, { params: { id } }) {
       >
         <header tw="flex text-[36px] w-full">
           <div tw="font-bold" style={font("Inter 600")}>
-            Guillermo Rauch
+            Dawid Moczadło
           </div>
           <div tw="grow" />
-          <div tw="text-[28px]">rauchg.com</div>
+          <div tw="text-[28px]">moczadlo.com</div>
         </header>
 
         <main tw="flex grow pb-3 flex-col items-center justify-center">

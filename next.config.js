@@ -38,7 +38,7 @@ module.exports = withMDX({
   headers() {
     return [
       {
-        source: "/images/rauchg-3d4cecf.jpg",
+        source: "/images/dawid.png",
         headers: [
           {
             key: "cache-control",
@@ -50,16 +50,11 @@ module.exports = withMDX({
   },
   redirects() {
     return [
-      {
-        source: "/essays/:nested*",
-        destination: "/",
-        permanent: true,
-      },
-      {
-        source: "/slackin/:nested*",
-        destination: "https://github.com/rauchg/slackin",
-        permanent: true,
-      },
+      // {
+      //   source: "/foo/:foo*",
+      //   destination: "/",
+      //   permanent: true,
+      // },
     ];
   },
 });

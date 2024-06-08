@@ -37,10 +37,10 @@ export default async function MainOG() {
       >
         <header tw="flex text-[36px] w-full">
           <div tw="font-bold" style={font("Inter 600")}>
-            Guillermo Rauch
+            Dawid Moczadło
           </div>
           <div tw="grow" />
-          <div tw="text-[28px]">rauchg.com</div>
+          <div tw="text-[28px]">moczadlo.com</div>
         </header>
 
         <main tw="flex mt-10 flex-col w-full" style={font("Roboto Mono 400")}>

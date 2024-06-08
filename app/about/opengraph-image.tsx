@@ -6,9 +6,8 @@ import { getPosts } from "@/app/get-posts";
 import commaNumber from "comma-number";
 
 export default async function AboutOG() {
-  // rauchg photo
-  const rauchgPhoto = fetch(
-    new URL(`../../public/images/rauchg-3d4cecf.gray.jpg`, import.meta.url)
+  const dawidPhoto = fetch(
+    new URL(`../../public/images/dawid.png`, import.meta.url)
   ).then(res => res.arrayBuffer());
 
   // fonts
@@ -48,23 +47,23 @@ export default async function AboutOG() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 tw="rounded-full h-74"
-                alt="Guillermo Rauch"
+                alt="Dawid Moczadło"
                 // @ts-ignore
-                src={await rauchgPhoto}
+                src={await dawidPhoto}
               />
             </div>
 
             <div tw="flex flex-col px-10 grow text-[28px] h-70 justify-center">
               <div tw="text-[64px] mb-7" style={font("Inter 500")}>
-                Guillermo Rauch
+                Dawid Moczadło
               </div>
               <div tw="flex mb-5" style={font("Roboto Mono 400")}>
-                <span tw="text-gray-400 mr-3">&mdash;</span> CEO and Founder of
-                Vercel
+                <span tw="text-gray-400 mr-3">&mdash;</span> Co-founder of
+                Vidoc Security Lab
               </div>
               <div tw="flex mb-5" style={font("Roboto Mono 400")}>
-                <span tw="text-gray-400 mr-3">&mdash;</span> Creator of Next.js,
-                Socket.IO, Mongoose
+                <span tw="text-gray-400 mr-3">&mdash;</span> Ethical hacker, software
+                engineer
               </div>
               <div tw="flex" style={font("Roboto Mono 400")}>
                 <span tw="text-gray-400 mr-3">&mdash;</span> Lives in San

@@ -1,7 +1,7 @@
 {
-  "name": "rauchg-blog",
+  "name": "dawid-blog",
   "license": "MIT",
-  "description": "rauchg.com (blog)",
+  "description": "dawid.com (blog)",
   "dependencies": {
     "@fontsource/inter": "^4.5.15",
     "@fontsource/roboto-mono": "^4.5.10",
