@@ -8,12 +8,25 @@
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     -webkit-tap-highlight-color: transparent;
     color-scheme: light;
+
+    --ring: 240 5% 64.9%;
+    --input: 214.3 31.8% 91.4%;
+    --border: 214.3 31.8% 91.4%;
+    --background: 0 0% 100%;
+
     /* note: must keep in sync with `theme-color` in `theme-effect.ts` */
     @apply bg-[#fcfcfc];
   }
 
+
+
   :root.dark {
     color-scheme: dark;
+
+    --background: 222.2 84% 4.9%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: hsl(212.7, 26.8%, 83.9);
     /* note: must keep in sync with `theme-color` in `theme-effect.ts` */
     @apply bg-[#1C1C1C];
   }

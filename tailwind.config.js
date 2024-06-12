@@ -5,7 +5,14 @@ module.exports = {
   darkMode: "class",
   content: ["./app/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+      },
+    },
   },
   plugins: [
     plugin(function ({ addVariant }) {

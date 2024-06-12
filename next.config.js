@@ -6,6 +6,7 @@ module.exports = withMDX({
     mdxRs: true,
   },
   swcMinify: true,
+  productionBrowserSourceMaps: false,
   reactStrictMode: true,
   images: {
     remotePatterns: [

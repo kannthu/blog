@@ -16,6 +16,14 @@ type Views = {
 };
 
 export const getPosts = async () => {
+  if("development" === process.env.NODE_ENV) {
+    return postsData.posts.map(post => ({
+      ...post,
+      views:0,
+      viewsFormatted: '0'
+    }))
+  }
+
   const allViews: null | Views = await redis.hgetall("views");
   const posts = postsData.posts.map((post): Post => {
     const views = Number(allViews?.[post.id] ?? 0);

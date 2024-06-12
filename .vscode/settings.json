@@ -1,4 +1,12 @@
 {
-  "typescript.tsdk": "node_modules/.pnpm/typescript@4.7.3/node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.stickyScroll.enabled": true,
+  "docwriter.style": "JSDoc"
 }
