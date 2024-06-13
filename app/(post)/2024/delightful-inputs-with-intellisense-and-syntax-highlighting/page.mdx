@@ -18,37 +18,95 @@ If you are reading this you probably made the mistake of creating your own [DLS 
 
 You thought it is a good idea to make your users learn new syntax just to use your product. I am not judging, I did the same.
 
-This blog is a summary of my efforts to unfuck the experience for my users. It is not a solution, it is a tradeof. You can flatten the learning curve of DSL by introducing some **technical debt**.
+This blog is a summary of my efforts to unfuck the experience for my users. You can flatten the learning curve of DSL by introducing some **technical debt**. It is not a solution, it is a tradeof.
+
+It was built using:
+- [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+- React
 
 # What you can expect
 
-<div className="flex mt-3 mb-7 bg-gradient-to-b from-blue-100 via-pink-100 to-blue-50 rounded-lg justify-center align-middle items-center w-full h-52">
-  <div className="w-full max-w-[550px]">
-    <p className="mb-1 dark:text-gray-800 text-sm font-medium">Simple input?</p>
-    <EditorSmallInput
-      value=""
-      languageId="typescript"
-      placeholder="wow, this even supports placeholder?!"
-    />
+<WithCaption caption={
+  <>
+    Example of hovers, completions and validation of custom DSL
+  </>
+}>
+  <div className="flex flex-col mt-3 py-3 bg-gradient-to-b from-blue-100 via-pink-100 to-blue-50 rounded-lg justify-center align-middle items-center w-full min-h-40">
+    <div className="w-full max-w-[550px]">
+      <span className="mb-2 dark:text-gray-800">Try me</span>
+      <CustomDSLInput input={`base64("edit_me2") == 1 && contains(BasePath, "foo")`} />
+    </div>
   </div>
-</div>
+</WithCaption>
 
-I won't give you copy-paste solution, my code sucks.
+> Note, not everything works perfectly, but it is a good start.
 
-So, you are building your groudbreaking, world changing project for technical people.
-You though it would be good idea to create your own DSL (Domain specific language) for your product.
+I won't give you copy-paste solution, my code sucks. I will show you what is possible with a little bit of work. I will set the bar for you.
 
-When you invent your own shitty DSL (Domain specific language) for your product, have a little bit of compasion for your users and implement input with with suggestions, completions and references
+You ove your users a decent experience, experience that does not require having a PHD in your DSL. Users do not want to learn and remember your syntax, they want to get the job done.
 
-User's do not want to learn and remember your syntax, they want to get the job done.
+# Examples
 
-//1. Example of your own DSL - vidoc modules
-//2. Example of other langs
-//3. Example of creating tables with this input
+Monaco editor can be rendered as a single input element, without sacrificing any of its features. It can be used for inline editing, with syntax highlighting, IntelliSense, and validation.
+
+<WithCaption caption={
+  <>
+    Example of hovers, completions and validation of custom DSL
+  </>
+}>
+  <div className="flex flex-col py-5 mt-3 bg-gradient-to-b from-blue-100 via-pink-100 to-blue-50 rounded-lg justify-center align-middle items-center w-full min-h-40">
+    <div className="w-full flex flex-col space-y-5 max-w-[550px]">
+      <div>
+        <span className="mb-2 dark:text-gray-800">With placeholder</span>
+        <CustomDSLInput input={``} />
+      </div>
+      <div>
+        <span className="mb-2 dark:text-gray-800">Read only</span>
+        <CustomDSLInput readOnly={true} input={`base64("I am readonly")`} />
+      </div>
+      <div>
+        <span className="mb-2 dark:text-gray-800">With errors</span>
+        <CustomDSLInput input={`base64("param1", "too many params")`} />
+      </div>
+      <div>
+        <span className="mb-2 dark:text-gray-800">Javascript</span>
+        <CustomDSLInput
+          languageId="javascript"
+          disableCustomDSL={true}
+          input={`console.log("Hello world"); // I am just javascript input`}
+        />
+      </div>
+
+
+      <div>
+        <TableWithEditorCells />
+      </div>
+    </div>
+  </div>
+</WithCaption>
+
+# Technical debt
+
+For me it was:
+
+- Compiling expression evaluator written in Go to Javascript (automatically!!) using [gopherjs](https://github.com/gopherjs/gopherjs)
+- Ducttaping my own shitty LSP
+- Making the Monaco Editor behave as in-line input
+- Making it all work in input
+- Making it work for multiple instances of inputs
+
+
+Contents:
+
+- aaa
+
+1. Example of your own DSL - vidoc modules
+2. Example of other langs
+3. Example of creating tables with this input
 
 - [ ] Post o inline monaco - https://farzadyz.com/blog/single-line-monaco-editor razem z przykładem jak działa
 
-<div className="flex flex-col space-y-2 mt-3 mb-7 bg-blue-100 rounded-lg justify-center align-middle items-center w-full h-52">
+{/* <div className="flex flex-col space-y-2 mt-3 mb-7 bg-blue-100 rounded-lg justify-center align-middle items-center w-full h-52">
   <div className="w-full max-w-[550px]">
     <p className="mb-1 dark:text-gray-800 text-sm font-medium">Placeholder</p>
     <EditorSmallInput
@@ -65,7 +123,7 @@ User's do not want to learn and remember your syntax, they want to get the job d
       placeholder="wow, this even supports placeholder?!"
     />
   </div>
-</div>
+</div> */}
 
 Following our [Series B last December](/2020/next-for-vercel), I'm happy to announce we've raised a [**$102M Series C**](https://techcrunch.com/2021/06/23/vercel-raises-102m-series-c-for-its-next-js-based-front-end-development-platform) from existing and new investors.
 

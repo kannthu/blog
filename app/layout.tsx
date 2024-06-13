@@ -6,6 +6,7 @@ import { Analytics } from "./analytics";
 import { Header } from "./header";
 import { Footer } from "./footer";
 import { doge } from "./doge";
+import "tippy.js/dist/tippy.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

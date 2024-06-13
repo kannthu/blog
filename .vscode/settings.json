@@ -7,6 +7,10 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[mdx]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "unifiedjs.vscode-mdx"
+  },
   "editor.stickyScroll.enabled": true,
   "docwriter.style": "JSDoc"
 }

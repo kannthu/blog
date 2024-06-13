@@ -1,4 +1,4 @@
-import { A } from "./(post)/components/a";
+import { A } from "./components/a";
 
 export function Footer() {
   return (

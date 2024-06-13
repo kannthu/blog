@@ -9,6 +9,7 @@ import {
 } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { cn } from "../utils";
 
 type WrapperProps = {
   isFocused: boolean;
@@ -16,26 +17,22 @@ type WrapperProps = {
 };
 
 const Wrapper = styled.div<WrapperProps>`
-  /* outline: ${props => (props.isFocused ? "2px auto #005fcc" : "none")}; */
-  /* background-color: ${props => (props.isReadOnly ? "#f5f5f5" : "white")}; */
-
-  /* &:hover {
-    outline: 2px auto ${props => (props.isFocused ? "#005fcc" : "#858585")};
-  } */
-
   & .monaco-editor,
   .monaco-editor-background,
   .monaco-editor .inputarea.ime-input {
+    cursor: ${props => (props.isReadOnly ? "not-allowed" : "text")};
     background-color: ${props =>
       props.isReadOnly ? "#f5f5f5" : "white"}!important;
   }
+
+  & .monaco-editor,
+  .monaco-editor-background,
+  .monaco-editor .view-lines {
+    cursor: ${props => (props.isReadOnly ? "not-allowed" : "text")};
+  }
 `;
 
-type FillProps = {
-  isReadOnly: boolean;
-};
-
-const Fill = styled.div<FillProps>`
+const Fill = styled.div`
   position: absolute;
   width: 100%;
   max-height: 100%;
@@ -45,7 +42,6 @@ const Fill = styled.div<FillProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   left: 0;
-  background-color: ${props => (props.isReadOnly ? "#f5f5f5" : "white")};
   z-index: 1;
   padding: 8px 8px;
   font-family: Menlo, Monaco, "Courier New", monospace;
@@ -113,28 +109,25 @@ const DefaultOptions: editor.IStandaloneEditorConstructionOptions = {
 
 type EditorSmallInputProps = {
   monaco: Monaco | null;
-  languageId?: string;
+  languageId: string;
   placeholder?: string;
   value: string;
   readOnly?: boolean;
   focusOnMount?: boolean;
   showTrailingSpaces?: boolean;
   onChange?: (value: string) => void;
+  onInstance?: (instance: editor.IStandaloneCodeEditor) => void;
 };
 
-// TODO implement https://farzadyz.com/blog/single-line-monaco-editor
 const EditorSmallInput = ({
   value: initialValue,
   placeholder,
-  //   monaco,
-  languageId = "plaintext",
+  monaco,
+  languageId,
   focusOnMount,
   readOnly,
-  showTrailingSpaces,
   onChange,
 }: EditorSmallInputProps) => {
-  const monaco = useMonaco();
-
   const [value, setValue] = useState(initialValue);
 
   const [model, setModel] = useState<editor.ITextModel>();
@@ -143,10 +136,9 @@ const EditorSmallInput = ({
   const [isMounted, setIsMounted] = useState(false);
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
 
-  //   useLineDecorator(instance, {
-  //     showLineEnding: false,
-  //     showTrailingSpaces,
-  //   });
+  const [path] = useState(
+    "a://a/file." + languageId + Math.round(Math.random() * 100)
+  );
 
   useEffect(() => {
     if (!model || !instance) {
@@ -342,9 +334,15 @@ const EditorSmallInput = ({
 
   return (
     <Wrapper
-      className="flex px-3 relative py-2 flex-grow h-9 max-h-9 w-full items-center justify-center rounded-md border border-gray-300  bg-white align-middle shadow-sm ring-offset-2 focus-visible:ring-2  ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-      isFocused={isFocused}
+      className={cn(
+        `flex px-3 relative py-2 flex-grow h-10 max-h-10 w-full items-center justify-center rounded-md border border-gray-300  align-middle shadow-sm ring-offset-2 focus-visible:ring-2  ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring`,
+        {
+          "bg-[#f5f5f5] cursor-not-allowed": readOnly,
+          "bg-white": !readOnly,
+        }
+      )}
       isReadOnly={readOnly ?? false}
+      isFocused={isFocused}
     >
       {placeholder && !isFocused && value.length === 0 && (
         <div
@@ -357,17 +355,28 @@ const EditorSmallInput = ({
         </div>
       )}
 
-      {!isMounted && <Fill isReadOnly={readOnly ?? false}>{initialValue}</Fill>}
+      {!isMounted && (
+        <Fill
+          className={cn({
+            "bg-gray-50 cursor-not-allowed": readOnly,
+            "bg-white": !readOnly,
+          })}
+        >
+          {initialValue}
+        </Fill>
+      )}
 
       <Editor
-        className="flex-grow"
+        className={cn("flex-grow", {
+          "cursor-not-allowed": readOnly,
+        })}
         width="100%"
         options={{
           ...DefaultOptions,
           readOnly: readOnly ?? false,
         }}
-        theme="vs-modules"
-        path={"a://b/fo1231.asd"}
+        path={path}
+        language={languageId}
         onChange={handleEditorChange}
         onMount={onMount}
       />
