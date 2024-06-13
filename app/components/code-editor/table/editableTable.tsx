@@ -120,7 +120,7 @@ const EditableTable = ({
   return (
     <div className="flex flex-col">
       <div className="flex justify-between">
-        <p className="mb-0">{title}</p>
+        <p className="mb-0 text-gray-800">{title}</p>
         <div className="flex justify-end">
           <Tippy content="Delete all items">
             <Button variant="link" className="p-1" onClick={handleRemoveAll}>

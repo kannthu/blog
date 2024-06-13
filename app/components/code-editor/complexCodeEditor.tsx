@@ -99,7 +99,7 @@ const CustomDSLInput = ({
           }
         }}
       >
-        {Icon} <span>{marker.message}</span>
+        {Icon} <span className="text-gray-800">{marker.message}</span>
       </div>
     );
   });
