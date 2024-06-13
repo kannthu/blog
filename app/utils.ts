@@ -3,7 +3,6 @@ import { extendTailwindMerge } from "tailwind-merge";
 
 const twMerge = extendTailwindMerge({
   // TaiLwind prefix
-  prefix: "tw-",
 });
 
 /**

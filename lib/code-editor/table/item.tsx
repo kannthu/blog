@@ -1,17 +1,9 @@
 import { Button } from "../../../components/button";
-import styled from "styled-components";
 import Tippy from "@tippyjs/react";
 import { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { EditorSmallInput } from "../../../components/inputCodeEditor";
 import { Monaco } from "@monaco-editor/react";
-import { Col } from "../../../components/col";
-
-const ItemKeyField = styled(Col)`
-  display: flex;
-  border-right: 1px solid #e8e8e8;
-  border-radius: 8px;
-`;
 
 export type EditableItem = {
   key: string;
@@ -59,11 +51,6 @@ const EditableTableItem = ({
     onItemChange(index, { ...item, key, value: newValue, isEnabled });
   };
 
-  const handleIsEnabledClick = () => {
-    setIsEnabled(!isEnabled);
-    onItemChange(index, { ...item, key, value, isEnabled: !isEnabled });
-  };
-
   const handleDeleteClick = () => {
     onItemDelete(index);
   };
@@ -75,7 +62,7 @@ const EditableTableItem = ({
         content={notEditableItemsHoverText}
         placement="bottom"
       >
-        <ItemKeyField sm={6} className="flex-grow flex">
+        <div className="flex-grow">
           <EditorSmallInput
             monaco={monaco}
             languageId={languageId}
@@ -84,14 +71,14 @@ const EditableTableItem = ({
             onChange={handleKeyChange}
             placeholder={`Parameter ${index + 1}`}
           />
-        </ItemKeyField>
+        </div>
       </Tippy>
       <Tippy
         disabled={!item.notEditable || notEditableItemsHoverText === undefined}
         content={notEditableItemsHoverText}
         placement="bottom"
       >
-        <ItemKeyField sm={6} className="flex-grow flex">
+        <div className="flex-grow">
           <EditorSmallInput
             monaco={monaco}
             languageId={languageId}
@@ -100,7 +87,7 @@ const EditableTableItem = ({
             readOnly={item.notEditable}
             onChange={handleValueChange}
           />
-        </ItemKeyField>
+        </div>
       </Tippy>
       <div className="px-1 flex justify-center align-center">
         <Tippy content={"Delete"}>

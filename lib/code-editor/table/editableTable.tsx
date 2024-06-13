@@ -1,16 +1,9 @@
 import { Button } from "../../../components/button";
-import styled from "styled-components";
 import Tippy from "@tippyjs/react";
 import { useEffect, useState } from "react";
 import { EditableItem, EditableTableItem } from "./item";
 import { AiOutlinePlus, AiOutlineDelete } from "react-icons/ai";
 import { Monaco } from "@monaco-editor/react";
-
-const Title = styled.label`
-  font-size: 0.85rem;
-  color: #a3a3a3;
-  font-weight: 600;
-`;
 
 const simpleMapToEditableItems = (map: {
   [key: string]: string;
