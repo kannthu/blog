@@ -17,10 +17,29 @@ import { Callout } from "@/components/callout";
 import { YouTube } from "@/components/youtube";
 import { Ref, FootNotes, FootNote } from "@/components/footnotes";
 import { Blockquote as blockquote } from "@/components/blockquote";
-import { EditorSmallInput } from "./components/inputCodeEditor";
-import { CustomDSLInput } from "./components/complexCodeEditor";
+// import { EditorSmallInput } from "./components/inputCodeEditor";
+// import { CustomDSLInput } from "./components/complexCodeEditor";
 import { WithCaption } from "./components/withCaption";
-import { TableWithEditorCells } from "./components/tableWithEditorCells";
+// import { TableWithEditorCells } from "./components/tableWithEditorCells";
+import dynamic from "next/dynamic";
+
+const CustomDSLInput = dynamic(
+  () =>
+    import("./components/complexCodeEditor").then(mod => mod.CustomDSLInput),
+  {
+    ssr: false,
+  }
+);
+
+const TableWithEditorCells = dynamic(
+  () =>
+    import("./components/tableWithEditorCells").then(
+      mod => mod.TableWithEditorCells
+    ),
+  {
+    ssr: false,
+  }
+);
 
 export function useMDXComponents(components: {
   [component: string]: React.ComponentType;
@@ -51,7 +70,7 @@ export function useMDXComponents(components: {
     FootNotes,
     FootNote,
     WithCaption,
-    EditorSmallInput,
+    // EditorSmallInput,
     CustomDSLInput,
     TableWithEditorCells,
   };

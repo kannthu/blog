@@ -3,30 +3,29 @@ import { getModuleintelisenseLanguage } from "./moduleIntelisense";
 
 const moduleIntellisensePlugin = (monaco: Monaco, languageId: string) => {
   const {
-    definition: moduleIntelisenseDefinition,
+    definition: moduleIntellisenseDefinition,
     setup: setupModuleIntelisense,
   } = getModuleintelisenseLanguage();
 
-  console.log("Initializing module itelisense", languageId);
+  // register new unique language
   monaco.languages.register({ id: languageId });
 
   const { dispose: tokensProviderDispose } =
     monaco.languages.setMonarchTokensProvider(
       languageId,
-      moduleIntelisenseDefinition.language
+      moduleIntellisenseDefinition.language
     );
 
   const { dispose: languageFeaturesDispose } =
     monaco.languages.setLanguageConfiguration(
       languageId,
-      moduleIntelisenseDefinition.conf
+      moduleIntellisenseDefinition.conf
     );
 
   const moduleDispose = setupModuleIntelisense(monaco, languageId, []);
 
   return () => {
     console.log("Disposing monaco language features", languageId);
-    // yamlDispose();
     moduleDispose();
     tokensProviderDispose();
     languageFeaturesDispose();

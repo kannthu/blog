@@ -12,5 +12,6 @@
     "editor.defaultFormatter": "unifiedjs.vscode-mdx"
   },
   "editor.stickyScroll.enabled": true,
-  "docwriter.style": "JSDoc"
+  "docwriter.style": "JSDoc",
+  "cSpell.words": ["Moduleintelisense"]
 }

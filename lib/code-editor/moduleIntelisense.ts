@@ -15,13 +15,12 @@ const richEditConfiguration: languages.LanguageConfiguration = {
   ],
 
   surroundingPairs: [
-    // { open: '<', close: '>' },
     { open: '"', close: '"' },
     { open: "'", close: "'" },
   ],
 };
 
-const languageDefiniton = <languages.IMonarchLanguage>{
+const languageDefinition = <languages.IMonarchLanguage>{
   // The main tokenizer for our languages
   tokenizer: {
     root: [
@@ -79,7 +78,6 @@ const setup = (
         _model,
         position
       ): languages.ProviderResult<languages.CompletionList> => {
-        console.log("provideCompletionItems");
         const suggestions = buildSuggestions(
           monacoEditor,
           [...initialPropSuggestions, ...additionalSuggestions],
@@ -110,7 +108,7 @@ const setup = (
     });
 
   let markerDataProvider = registerMarkerDataProvider(monacoEditor, pluginId, {
-    owner: "module-intelisense",
+    owner: "module-intellisense",
     async provideMarkerData(model) {
       return validate(model, additionalSuggestions);
     },
@@ -126,7 +124,7 @@ const setup = (
 const getModuleintelisenseLanguage = () => {
   return {
     definition: {
-      language: languageDefiniton,
+      language: languageDefinition,
       conf: richEditConfiguration,
     },
     setup,
