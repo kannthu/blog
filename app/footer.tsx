@@ -1,4 +1,4 @@
-import { A } from "./components/a";
+import { A } from "../components/a";
 
 export function Footer() {
   return (

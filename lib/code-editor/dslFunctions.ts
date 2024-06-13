@@ -1,4 +1,4 @@
-const NUCLEI_NAME_MAP: {
+const LEGACY_NAME_MAP: {
   [key: string]: string;
 } = {
   len: "len",
@@ -126,32 +126,19 @@ const FUNCTIONS_MAP = {
 };
 
 const REQUEST_VARIABLES = {
-  InteractionURL: "string",
-  InteractionLDAP: "string",
   BaseURL: "string",
   RootURL: "string",
   Hostname: "string",
-  Ip: "string",
   IP: "string",
   Host: "string",
   Port: "number",
   Scheme: "string",
   BasePath: "string",
   RandomUserAgent: "string",
-  FQDN: "string",
-  RDN: "string",
-  DN: "string",
-  TLD: "string",
-  SD: "string",
-  CalculatedContentLength: "number",
 };
 
 // these are used in matcher type dsl
 const DSL_MATCHER_VARIABLES = {
-  // these are for nuclei compatibility
-  Host: 'string',
-  ip: 'string',
-
   host: "string",
   body: "string",
   content_length: "number",
@@ -162,7 +149,7 @@ const DSL_MATCHER_VARIABLES = {
 };
 
 export {
-  NUCLEI_NAME_MAP,
+  LEGACY_NAME_MAP,
   FUNCTIONS_MAP,
   REQUEST_VARIABLES,
   DSL_MATCHER_VARIABLES,

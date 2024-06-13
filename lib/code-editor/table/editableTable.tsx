@@ -1,4 +1,4 @@
-import { Button } from "../../button";
+import { Button } from "../../../components/button";
 import styled from "styled-components";
 import Tippy from "@tippyjs/react";
 import { useEffect, useState } from "react";

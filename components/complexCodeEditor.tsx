@@ -6,10 +6,9 @@ import {
   MarkerSeverity,
 } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { useEffect, useState } from "react";
-import { moduleIntelisensePlugin } from "./moduleIntelisensePlugin";
-import { EditorSmallInput } from "../inputCodeEditor";
+import { moduleIntellisensePlugin } from "../lib/code-editor/moduleIntellisensePlugin";
+import { EditorSmallInput } from "./inputCodeEditor";
 import { BiError } from "react-icons/bi";
-import { EditableTable } from "./table/editableTable";
 
 const MarkerSeverityToIcon = {
   [MarkerSeverity.Error]: <BiError color="red" size="20px" />,
@@ -36,6 +35,7 @@ const CustomDSLInput = ({
 
   const monaco = useMonaco();
 
+  // this needs to be a random string to avoid conflicts with other languages and instances
   const [languageId, _] = useState(
     initialLanguage ?? `${Math.round(Math.random() * 1000)}_module`
   );
@@ -50,7 +50,7 @@ const CustomDSLInput = ({
       return;
     }
 
-    const dispose = moduleIntelisensePlugin(monaco, languageId);
+    const dispose = moduleIntellisensePlugin(monaco, languageId);
 
     const { dispose: disposeMarkers } = monaco.editor.onDidChangeMarkers(
       ([resource]) => {
@@ -111,7 +111,6 @@ const CustomDSLInput = ({
         languageId={languageId}
         placeholder="Hello, I am your placeholder!"
         value={input}
-        showTrailingSpaces={true}
         onInstance={onMount}
         readOnly={readOnly}
       />

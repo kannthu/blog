@@ -14,15 +14,20 @@ export const metadata = {
   },
 };
 
-If you are reading this you probably made the mistake of creating your own [DLS (Domain specific language)](https://en.wikipedia.org/wiki/Domain-specific_language).
+If you are reading this you probably made the mistake of creating your own [DSL (Domain specific language)](https://en.wikipedia.org/wiki/Domain-specific_language).
 
 You thought it is a good idea to make your users learn new syntax just to use your product. I am not judging, I did the same.
 
 This blog is a summary of my efforts to unfuck the experience for my users. You can flatten the learning curve of DSL by introducing some **technical debt**. It is not a solution, it is a tradeof.
 
 It was built using:
-- [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+- [`@monaco-editor/react`](https://www.npmjs.com/package/@monaco-editor/react)
+- [monaco-editor](https://www.npmjs.com/package/monaco-editor)
 - React
+
+If you hate technical debt and hacky solutions, do not read it.
+
+Note - it does not really work for mobile.
 
 # What you can expect
 
@@ -33,7 +38,7 @@ It was built using:
 }>
   <div className="flex flex-col mt-3 py-3 bg-gradient-to-b from-blue-100 via-pink-100 to-blue-50 rounded-lg justify-center align-middle items-center w-full min-h-40">
     <div className="w-full max-w-[550px]">
-      <span className="mb-2 dark:text-gray-800">Try me</span>
+      <span className="mb-2 dark:text-gray-800">Playground input</span>
       <CustomDSLInput input={`base64("edit_me2") == 1 && contains(BasePath, "foo")`} />
     </div>
   </div>
@@ -56,6 +61,10 @@ Monaco editor can be rendered as a single input element, without sacrificing any
 }>
   <div className="flex flex-col py-5 mt-3 bg-gradient-to-b from-blue-100 via-pink-100 to-blue-50 rounded-lg justify-center align-middle items-center w-full min-h-40">
     <div className="w-full flex flex-col space-y-5 max-w-[550px]">
+      <div>
+      <span className="mb-2 dark:text-gray-800">Custom DSL</span>
+      <CustomDSLInput input={`base64("edit_me2") == 1 && contains(BasePath, "foo")`} />
+      </div>
       <div>
         <span className="mb-2 dark:text-gray-800">With placeholder</span>
         <CustomDSLInput input={``} />
@@ -85,7 +94,60 @@ Monaco editor can be rendered as a single input element, without sacrificing any
   </div>
 </WithCaption>
 
-# Technical debt
+
+# How it works technically
+
+The big problem is that we do not want to write LSP (Language Server) for our DSL. We want to deliver **decent experience, fast**.
+
+The solution is to use expression evaluator for your DSL that will try evaluating the expression with stubs and return errors if something is wrong. You can even implement type checks for my DSL! In my case the evaluator is written in Go and I had to compile it to Javascript using [gopherjs](https://github.com/gopherjs/gopherjs). So it is better to have it in JS or TS.
+
+## Pseudo code
+Each time user changes the input, we evaluate the expression and display the errors as markers in the editor. **It is not a LSP, but for this case it approximates the experience**.
+
+```javascript
+const expr = `contains(BasePath, "foo") == true`;
+
+const stubVariables = {
+  // variable name corresponds to its type
+  BasePath: "string",
+  RootURL: "string",
+  Hostname: "string",
+  Time: "number",
+  // ...
+}
+
+const stubFunctions = {
+  md5: validate("md5", ["string"], "string"),
+  sha256: validate("sha256", ["string"], "string"),
+  sha1: validate("sha1", ["string"], "string"),
+  mmh3: validate("mmh3", ["string"], "string"),
+  contains: validate("contains", ["string", "string"], true),
+};
+
+const errors = evaluateExpression(
+  expr,
+  {
+    ...stubVariables,
+    ...stubFunctions
+  }
+);
+```
+
+`validate` is higher order function that returns a function that will validate the arguments and return the result.
+
+# Making Monaco Editor behave as in-line input
+
+My code is not limited to single line inputs, it can be extended to multi-line inputs as well.
+
+Caveats:
+- It does not really work for mobile
+
+
+```typescript
+a
+```
+
+{/* # Technical debt
 
 For me it was:
 
@@ -93,39 +155,10 @@ For me it was:
 - Ducttaping my own shitty LSP
 - Making the Monaco Editor behave as in-line input
 - Making it all work in input
-- Making it work for multiple instances of inputs
+- Making it work for multiple instances of inputs */}
 
 
-Contents:
-
-- aaa
-
-1. Example of your own DSL - vidoc modules
+{/* 1. Example of your own DSL - vidoc modules
 2. Example of other langs
 3. Example of creating tables with this input
-
-- [ ] Post o inline monaco - https://farzadyz.com/blog/single-line-monaco-editor razem z przykładem jak działa
-
-{/* <div className="flex flex-col space-y-2 mt-3 mb-7 bg-blue-100 rounded-lg justify-center align-middle items-center w-full h-52">
-  <div className="w-full max-w-[550px]">
-    <p className="mb-1 dark:text-gray-800 text-sm font-medium">Placeholder</p>
-    <EditorSmallInput
-      value=""
-      languageId="plaintext"
-      placeholder="wow, this even supports placeholder?!"
-    />
-  </div>
-  <div className="w-full max-w-[550px]">
-    <p className="mb-1 dark:text-gray-800 text-sm font-medium">References</p>
-    <EditorSmallInput
-      value="eval('click_me')"
-      languageId="typescript"
-      placeholder="wow, this even supports placeholder?!"
-    />
-  </div>
-</div> */}
-
-Following our [Series B last December](/2020/next-for-vercel), I'm happy to announce we've raised a [**$102M Series C**](https://techcrunch.com/2021/06/23/vercel-raises-102m-series-c-for-its-next-js-based-front-end-development-platform) from existing and new investors.
-
-Our vision of the Web is a global realtime medium for both creators and consumers,
-where all friction and latency are eliminated.
+*/}

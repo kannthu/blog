@@ -1,7 +1,7 @@
 import { Monaco } from "@monaco-editor/react";
 import { getModuleintelisenseLanguage } from "./moduleIntelisense";
 
-const moduleIntelisensePlugin = (monaco: Monaco, languageId: string) => {
+const moduleIntellisensePlugin = (monaco: Monaco, languageId: string) => {
   const {
     definition: moduleIntelisenseDefinition,
     setup: setupModuleIntelisense,
@@ -33,4 +33,4 @@ const moduleIntelisensePlugin = (monaco: Monaco, languageId: string) => {
   };
 };
 
-export { moduleIntelisensePlugin };
+export { moduleIntellisensePlugin };

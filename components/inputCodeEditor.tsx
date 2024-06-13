@@ -1,15 +1,14 @@
 "use client";
 
-// import { useLineDecorator } from '@/lib/server/modules/monaco/plugins/newLineDecorator';
-import Editor, { Monaco, useMonaco } from "@monaco-editor/react";
+import Editor, { Monaco } from "@monaco-editor/react";
 import {
   editor,
   KeyMod,
   KeyCode,
 } from "monaco-editor/esm/vs/editor/editor.api.js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { cn } from "../utils";
+import { cn } from "../app/utils";
 
 type WrapperProps = {
   isFocused: boolean;
@@ -22,7 +21,7 @@ const Wrapper = styled.div<WrapperProps>`
   .monaco-editor .inputarea.ime-input {
     cursor: ${props => (props.isReadOnly ? "not-allowed" : "text")};
     background-color: ${props =>
-      props.isReadOnly ? "#f5f5f5" : "white"}!important;
+      props.isReadOnly ? "#eceaea" : "white"}!important;
   }
 
   & .monaco-editor,
@@ -103,7 +102,7 @@ const DefaultOptions: editor.IStandaloneEditorConstructionOptions = {
   // auto adjust width and height to parent
   // see: https://github.com/Microsoft/monaco-editor/issues/543#issuecomment-321767059
   automaticLayout: true,
-  // if monaco is inside a table, hover tips or completion may casue table body scroll
+  // if monaco is inside a table, hover tips or completion may cause table body scroll
   fixedOverflowWidgets: true,
 };
 
@@ -114,15 +113,18 @@ type EditorSmallInputProps = {
   value: string;
   readOnly?: boolean;
   focusOnMount?: boolean;
-  showTrailingSpaces?: boolean;
   onChange?: (value: string) => void;
   onInstance?: (instance: editor.IStandaloneCodeEditor) => void;
 };
 
+const MAX_LINES = 1;
+
+// this is not a controlled component
 const EditorSmallInput = ({
   value: initialValue,
   placeholder,
   monaco,
+  // this needs to be a random string to avoid conflicts with other languages and instances
   languageId,
   focusOnMount,
   readOnly,
@@ -136,8 +138,12 @@ const EditorSmallInput = ({
   const [isMounted, setIsMounted] = useState(false);
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
 
-  const [path] = useState(
-    "a://a/file." + languageId + Math.round(Math.random() * 100)
+  // path needs to be unique per each instance
+  // because if its not then if user edits one instance
+  // it will also edit other instances
+  const path = useMemo(
+    () => "path://file." + languageId + Math.round(Math.random() * 100),
+    []
   );
 
   useEffect(() => {
@@ -150,7 +156,7 @@ const EditorSmallInput = ({
       return;
     }
 
-    // if someone typed brackets it might open suggest widget
+    // if someone typed character that might open suggest widget
     // so we need to wait for it to close before changing model
     // it will be better for user experience
     if (
@@ -197,22 +203,6 @@ const EditorSmallInput = ({
       setIsSuggestionsVisible(false);
     }
 
-    monaco.editor.defineTheme("vs-modules", {
-      base: "vs",
-      inherit: true,
-      rules: [
-        {
-          token: "variable.parameter",
-          foreground: "001188",
-        },
-        {
-          token: "string",
-          foreground: "000000",
-        },
-      ],
-      colors: {},
-    });
-
     const newModel = monaco.editor.createModel(initialValue, languageId);
 
     instance.setModel(newModel);
@@ -222,7 +212,7 @@ const EditorSmallInput = ({
       instance.focus();
       // and set position to end
       instance.setPosition({
-        lineNumber: 1,
+        lineNumber: MAX_LINES,
         column: initialValue.length + 1,
       });
     }
@@ -255,54 +245,70 @@ const EditorSmallInput = ({
       },
     });
 
+    // you can disable Enter if you want or remove the lines bellow
+    //
     // disable press `Enter` in case of producing line breaks
-    instance.addAction({
-      id: "prevent_enter",
-      label: "Execute Block",
-      keybindings: [KeyCode.Enter],
-      contextMenuGroupId: "2_execution",
-      precondition: blockContext,
-      run: () => {
-        // enter only should trigger accepting of suggestion
-        instance.trigger("", "acceptSelectedSuggestion", "");
-      },
-    });
+    // instance.addAction({
+    //   id: "prevent_enter",
+    //   label: "Execute Block",
+    //   keybindings: [KeyCode.Enter],
+    //   contextMenuGroupId: "2_execution",
+    //   precondition: blockContext,
+    //   run: () => {
+    //     // enter only should trigger accepting of suggestion
+    //     instance.trigger("", "acceptSelectedSuggestion", "");
+    //   },
+    // });
 
     // deal with user paste
     // see: https://github.com/microsoft/monaco-editor/issues/2009#issue-63987720
     const { dispose: disposePaste } = instance.onDidPaste(e => {
+      const content = instance.getValue();
+      const lines = content.split("\n");
+
+      if (lines.length <= MAX_LINES) {
+        return;
+      }
+
       // multiple rows will be merged to single row
-      if (e.range.endLineNumber <= 1) {
-        return;
-      }
-
-      if (!newModel) {
-        return;
-      }
-
-      let newContent = "";
-
-      const lineCount = newModel.getLineCount();
-      // remove all line breaks
-      for (let i = 0; i < lineCount; i += 1) {
-        newContent += newModel.getLineContent(i + 1);
-      }
-      newModel.setValue(newContent);
-      instance.setPosition({ column: newContent.length + 1, lineNumber: 1 });
+      instance.setValue(lines.join(""));
+      instance.setPosition({
+        column: lines.join("").length + 1,
+        lineNumber: MAX_LINES,
+      });
     });
 
-    const { dispose: disposseFocus } = instance.onDidFocusEditorText(() => {
+    // handle cursor going to > MAX_LINES line
+    const { dispose: disposeCursorChange } = instance.onDidChangeCursorPosition(
+      e => {
+        // Monaco tells us the line number after cursor position changed
+        if (e.position.lineNumber > MAX_LINES) {
+          // Trim editor value
+          instance.setValue(instance.getValue().trim());
+          // Bring back the cursor to the end of the first line
+          instance.setPosition({
+            ...e.position,
+            // Setting column to Infinity would mean the end of the line
+            column: Infinity,
+            lineNumber: MAX_LINES,
+          });
+        }
+      }
+    );
+
+    const { dispose: disposeFocus } = instance.onDidFocusEditorText(() => {
       setIsFocused(true);
     });
 
-    const { dispose: disposseBlur } = instance.onDidBlurEditorText(() => {
+    const { dispose: disposeBlur } = instance.onDidBlurEditorText(() => {
       setIsFocused(false);
     });
 
     return () => {
+      disposeCursorChange();
       disposePaste();
-      disposseFocus();
-      disposseBlur();
+      disposeFocus();
+      disposeBlur();
       newModel.dispose();
     };
   }, [instance, monaco]);
@@ -321,8 +327,8 @@ const EditorSmallInput = ({
   };
 
   const handleEditorChange = (value: string | undefined) => {
-    // thss handler will be called even when we change model
-    // so we need to check if value is acutally changed
+    // this handler will be called even when we change model
+    // so we need to check if value actually changed
     if (value && value !== initialValue) {
       if (onChange) {
         onChange(value);
@@ -337,7 +343,7 @@ const EditorSmallInput = ({
       className={cn(
         `flex px-3 relative py-2 flex-grow h-10 max-h-10 w-full items-center justify-center rounded-md border border-gray-300  align-middle shadow-sm ring-offset-2 focus-visible:ring-2  ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring`,
         {
-          "bg-[#f5f5f5] cursor-not-allowed": readOnly,
+          "bg-[#eceaea] cursor-not-allowed": readOnly,
           "bg-white": !readOnly,
         }
       )}

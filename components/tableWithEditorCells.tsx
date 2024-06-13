@@ -2,8 +2,8 @@
 
 import { useMonaco } from "@monaco-editor/react";
 import { useEffect, useState } from "react";
-import { moduleIntelisensePlugin } from "./moduleIntelisensePlugin";
-import { EditableTable } from "./table/editableTable";
+import { moduleIntellisensePlugin } from "../lib/code-editor/moduleIntellisensePlugin";
+import { EditableTable } from "../lib/code-editor/table/editableTable";
 
 const TableWithEditorCells = () => {
   const monaco = useMonaco();
@@ -12,13 +12,13 @@ const TableWithEditorCells = () => {
     `${Math.round(Math.random() * 1000)}_module`
   );
 
-  // initialize module plugin for moanco instance
+  // initialize module plugin for monaco instance
   useEffect(() => {
     if (!monaco) {
       return;
     }
 
-    const dispose = moduleIntelisensePlugin(monaco, languageId);
+    const dispose = moduleIntellisensePlugin(monaco, languageId);
 
     return () => {
       dispose();

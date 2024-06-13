@@ -1,12 +1,11 @@
-import { Button } from "../../button";
+import { Button } from "../../../components/button";
 import styled from "styled-components";
-import { BsCheckCircle, BsCircle } from "react-icons/bs";
 import Tippy from "@tippyjs/react";
 import { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
-import { EditorSmallInput } from "../../inputCodeEditor";
+import { EditorSmallInput } from "../../../components/inputCodeEditor";
 import { Monaco } from "@monaco-editor/react";
-import { Col } from "../../col";
+import { Col } from "../../../components/col";
 
 const ItemKeyField = styled(Col)`
   display: flex;
@@ -83,7 +82,6 @@ const EditableTableItem = ({
             value={key}
             readOnly={item.notEditable}
             onChange={handleKeyChange}
-            showTrailingSpaces={true}
             placeholder={`Parameter ${index + 1}`}
           />
         </ItemKeyField>
@@ -100,7 +98,6 @@ const EditableTableItem = ({
             placeholder={`Value ${index + 1}`}
             value={value}
             readOnly={item.notEditable}
-            showTrailingSpaces={true}
             onChange={handleValueChange}
           />
         </ItemKeyField>
