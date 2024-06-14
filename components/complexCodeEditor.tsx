@@ -9,6 +9,15 @@ import { useEffect, useState } from "react";
 import { moduleIntellisensePlugin } from "../lib/code-editor/moduleIntellisensePlugin";
 import { EditorSmallInput } from "./inputCodeEditor";
 import { BiError } from "react-icons/bi";
+import dynamic from "next/dynamic";
+
+// const EditorSmallInput = dynamic(
+//   () => import("./inputCodeEditor").then(mod => mod.EditorSmallInput),
+//   {
+//     ssr: false,
+//   }
+// );
+export const generateStaticParams = () => [];
 
 const MarkerSeverityToIcon = {
   [MarkerSeverity.Error]: <BiError color="red" size="20px" />,
@@ -39,6 +48,7 @@ const CustomDSLInput = ({
   const [languageId, _] = useState(
     initialLanguage ?? `${Math.round(Math.random() * 1000)}_module`
   );
+  console.log("AAAA", typeof window !== "undefined");
 
   // initialize module plugin for moanco instance
   useEffect(() => {
@@ -46,7 +56,7 @@ const CustomDSLInput = ({
       return;
     }
 
-    if (disableCustomDSL) {
+    if (disableCustomDSL || window !== undefined) {
       return;
     }
 
@@ -119,4 +129,8 @@ const CustomDSLInput = ({
   );
 };
 
-export { CustomDSLInput };
+const Aa = dynamic(() => Promise.resolve(CustomDSLInput), {
+  ssr: false,
+});
+
+export { Aa as CustomDSLInput };

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { themeEffect } from "./theme-effect";
+import { themeEffect } from "../lib/theme-effect";
 import va from "@vercel/analytics";
 
 export function ThemeToggle() {
@@ -14,15 +14,28 @@ export function ThemeToggle() {
 
   const onMediaChange = useCallback(() => {
     const current = themeEffect();
+
+    if (!current) {
+      return;
+    }
+
     setCurrentTheme(current);
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     setPreference(localStorage.getItem("theme"));
     const current = themeEffect();
+
+    if (!current) {
+      return;
+    }
+
     setCurrentTheme(current);
 
-    const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
+    const matchMedia =
+      window && window.matchMedia("(prefers-color-scheme: dark)");
     matchMedia.addEventListener("change", onMediaChange);
     return () => matchMedia.removeEventListener("change", onMediaChange);
   }, [onMediaChange]);
@@ -37,10 +50,16 @@ export function ThemeToggle() {
   // when the preference changes, whether from this tab or another,
   // we want to recompute the current theme
   useEffect(() => {
-    setCurrentTheme(themeEffect());
+    const theme = themeEffect();
+
+    if (theme) {
+      setCurrentTheme(theme);
+    }
   }, [preference]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     window.addEventListener("storage", onStorageChange);
     return () => window.removeEventListener("storage", onStorageChange);
   });
@@ -78,7 +97,7 @@ export function ThemeToggle() {
           isHovering && !isHoveringOverride
             ? "bg-gray-200 dark:bg-[#313131]"
             : ""
-        } active:bg-gray-300 transition-[background-color] dark:active:bg-[#242424] rounded-sm p-2 
+        } active:bg-gray-300 transition-[background-color] dark:active:bg-[#242424] rounded-sm p-2
           bg-gray-200
           dark:bg-[#313131]
           theme-system:!bg-inherit
@@ -93,10 +112,10 @@ export function ThemeToggle() {
 
           let newPreference: string | null =
             currentTheme === "dark" ? "light" : "dark";
-          const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-            .matches
-            ? "dark"
-            : "light";
+          const systemTheme =
+            window && window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
 
           // if the user has their current OS theme as a preference (instead of auto)
           // and they click the toggle, we want to switch to reset the preference

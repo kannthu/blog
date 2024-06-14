@@ -1,5 +1,5 @@
 import { Header } from "./header";
-import { getPosts } from "../get-posts";
+import { getPosts } from "../../lib/get-posts";
 
 export const revalidate = 60;
 

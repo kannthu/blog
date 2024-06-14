@@ -1,4 +1,3 @@
-export const runtime = "edge";
 export const revalidate = 60;
 
 import { ImageResponse } from "next/og";
@@ -58,12 +57,12 @@ export default async function AboutOG() {
                 Dawid Moczadło
               </div>
               <div tw="flex mb-5" style={font("Roboto Mono 400")}>
-                <span tw="text-gray-400 mr-3">&mdash;</span> Co-founder of
-                Vidoc Security Lab
+                <span tw="text-gray-400 mr-3">&mdash;</span> Co-founder of Vidoc
+                Security Lab
               </div>
               <div tw="flex mb-5" style={font("Roboto Mono 400")}>
-                <span tw="text-gray-400 mr-3">&mdash;</span> Ethical hacker, software
-                engineer
+                <span tw="text-gray-400 mr-3">&mdash;</span> Ethical hacker,
+                software engineer
               </div>
               <div tw="flex" style={font("Roboto Mono 400")}>
                 <span tw="text-gray-400 mr-3">&mdash;</span> Lives in San

@@ -8,7 +8,7 @@ import {
 } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { cn } from "../app/utils";
+import { cn } from "../lib/utils";
 
 type WrapperProps = {
   isFocused: boolean;
@@ -130,6 +130,11 @@ const EditorSmallInput = ({
   readOnly,
   onChange,
 }: EditorSmallInputProps) => {
+  // if (typeof window === "undefined") {
+  //   console.log("window is undefined");
+  //   return <></>;
+  // }
+
   const [value, setValue] = useState(initialValue);
 
   const [model, setModel] = useState<editor.ITextModel>();

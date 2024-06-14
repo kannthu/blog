@@ -1,5 +1,5 @@
-import { ThemeToggle } from "./theme-toggle";
-import { Logo } from "./logo";
+import { ThemeToggle } from "../components/theme-toggle";
+import { Logo } from "../components/logo";
 import Link from "next/link";
 
 export function Header() {

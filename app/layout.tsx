@@ -2,11 +2,11 @@ import "./globals.css";
 import "tippy.js/dist/tippy.css";
 
 import { Inter } from "next/font/google";
-import { themeEffect } from "./theme-effect";
-import { Analytics } from "./analytics";
+import { themeEffect } from "../lib/theme-effect";
+import { Analytics } from "../components/analytics";
 import { Header } from "./header";
 import { Footer } from "./footer";
-import { doge } from "./doge";
+import { doge } from "../components/doge";
 
 const inter = Inter({ subsets: ["latin"] });
 

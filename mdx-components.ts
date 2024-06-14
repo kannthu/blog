@@ -19,9 +19,16 @@ import { Ref, FootNotes, FootNote } from "@/components/footnotes";
 import { Blockquote as blockquote } from "@/components/blockquote";
 // import { EditorSmallInput } from "./components/inputCodeEditor";
 // import { CustomDSLInput } from "./components/complexCodeEditor";
-import { WithCaption } from "./components/withCaption";
+// import { WithCaption } from "./components/withCaption";
 // import { TableWithEditorCells } from "./components/tableWithEditorCells";
 import dynamic from "next/dynamic";
+
+const WithCaption = dynamic(
+  () => import("./components/withCaption").then(mod => mod.WithCaption),
+  {
+    ssr: false,
+  }
+);
 
 const CustomDSLInput = dynamic(
   () =>
