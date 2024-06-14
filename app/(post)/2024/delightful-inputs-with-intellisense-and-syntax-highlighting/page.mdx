@@ -1,11 +1,11 @@
 export const metadata = {
   title: "Delightful inputs with IntelliSense and Syntax Highlighting",
   description:
-    "Our vision of the Web is a global realtime medium for both creators and consumers, where all friction and latency are eliminated",
+    "Building IntelliSense and Syntax Highlighting for custom DSL in Monaco Editor (React)",
   openGraph: {
     title: "Delightful inputs with IntelliSense and Syntax Highlighting",
     description:
-      "Our vision of the Web is a global realtime medium for both creators and consumers, where all friction and latency are eliminated",
+      "Building IntelliSense and Syntax Highlighting for custom DSL in Monaco Editor (React)",
     images: [
       {
         url: "/og/delightful-inputs-with-intellisense-and-syntax-highlighting",
@@ -13,6 +13,9 @@ export const metadata = {
     ],
   },
 };
+
+> **TL;DR;**
+> The article is about building IntelliSense and Syntax Highlighting for custom DSL in Monaco Editor (React).
 
 If you are reading this you probably made the mistake of creating your own [DSL (Domain specific language)](https://en.wikipedia.org/wiki/Domain-specific_language).
 
@@ -26,8 +29,6 @@ It was built using:
 - React
 
 If you hate technical debt and hacky solutions, do not read it.
-
-Note - it does not really work for mobile.
 
 # What you can expect
 
@@ -136,28 +137,50 @@ const errors = evaluateExpression(
 
 # Making Monaco Editor behave as in-line input
 
-My code is not limited to single line inputs, it can be extended to multi-line inputs as well.
+You can just copy-paste the [source code](https://github.com/kannthu/blog/blob/42c1532a22a77beff70417db2ef39df711c643ec/components/inputCodeEditor.tsx#L123) and it will work. It is not perfect, but it is a good start.
 
 Caveats:
-- It does not really work for mobile
+- Hovers do not work on mobile
 
+Example usage:
+```tsx
+import { useMonaco } from "@monaco-editor/react";
+import { EditorSmallInput } from "...";
 
-```typescript
-a
+const Component = () => {
+  const monaco = useMonaco();
+
+  // language ID should be unique per instance of component
+  const languageId = "customDSL";
+
+  return (
+    <EditorSmallInput
+      monaco={monaco}
+      languageId={languageId}
+      placeholder="Hello, I am your placeholder!"
+      value={"initial_value_here"}
+    />
+  )
+}
 ```
 
-{/* # Technical debt
+My code is not limited to single line inputs, it can be extended to multi-line inputs as well.
 
-For me it was:
+You can change the number of lines by changing the constant in the [code](https://github.com/kannthu/blog/blob/42c1532a22a77beff70417db2ef39df711c643ec/components/inputCodeEditor.tsx#L120).
+```typescript
+// ...
+const MAX_LINES = 1;
+// ...
+```
 
-- Compiling expression evaluator written in Go to Javascript (automatically!!) using [gopherjs](https://github.com/gopherjs/gopherjs)
-- Ducttaping my own shitty LSP
-- Making the Monaco Editor behave as in-line input
-- Making it all work in input
-- Making it work for multiple instances of inputs */}
+# Your own "IntelliSense"
 
+Check out [source code](https://github.com/kannthu/blog/blob/42c1532a22a77beff70417db2ef39df711c643ec/lib/code-editor/moduleIntellisensePlugin.ts#L4) for IntelliSense of my DSL.
 
-{/* 1. Example of your own DSL - vidoc modules
-2. Example of other langs
-3. Example of creating tables with this input
-*/}
+It has set of completions, hovers and validations. You can edit it to fit your needs.
+
+# Final;
+
+I hope this article will help you to make your DSL more user friendly. It is not a perfect solution, but it works.
+
+If you would like to see more examples or have any questions, feel free to reach out to me at [@kannthu1](https://x.com/kannthu1).
