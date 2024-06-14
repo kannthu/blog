@@ -10,9 +10,7 @@ export const themeEffect = function () {
 
   if (
     pref === "dark" ||
-    (!pref &&
-      window &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches)
+    (!pref && window.matchMedia("(prefers-color-scheme: dark)").matches)
   ) {
     document.documentElement.classList.add("pause-transitions");
     document.documentElement.classList.add("dark");

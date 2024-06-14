@@ -107,10 +107,10 @@ export function ThemeToggle() {
 
           let newPreference: string | null =
             currentTheme === "dark" ? "light" : "dark";
-          const systemTheme =
-            window && window.matchMedia("(prefers-color-scheme: dark)").matches
-              ? "dark"
-              : "light";
+          const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+            .matches
+            ? "dark"
+            : "light";
 
           // if the user has their current OS theme as a preference (instead of auto)
           // and they click the toggle, we want to switch to reset the preference

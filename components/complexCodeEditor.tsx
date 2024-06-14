@@ -39,7 +39,6 @@ const CustomDSLInput = ({
   const [languageId, _] = useState(
     initialLanguage ?? `${Math.round(Math.random() * 1000)}_module`
   );
-  console.log("AAAA", typeof window !== "undefined");
 
   // initialize module plugin for moanco instance
   useEffect(() => {
@@ -47,7 +46,7 @@ const CustomDSLInput = ({
       return;
     }
 
-    if (disableCustomDSL || window !== undefined) {
+    if (disableCustomDSL) {
       return;
     }
 
