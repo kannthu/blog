@@ -1,4 +1,4 @@
-export const runtime = "experimental-edge";
+export const runtime = "edge";
 
 import { ImageResponse } from "next/og";
 import { getPosts } from "@/lib/get-posts";

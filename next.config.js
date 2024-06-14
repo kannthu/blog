@@ -5,7 +5,7 @@ module.exports = withMDX({
   // experimental: {
   //   mdxRs: true,
   // },
-  swcMinify: true,
+  // swcMinify: true,
   productionBrowserSourceMaps: false,
   reactStrictMode: true,
   images: {

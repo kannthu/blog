@@ -6,46 +6,42 @@ import { moduleIntellisensePlugin } from "../lib/code-editor/moduleIntellisenseP
 import { EditableTable } from "../lib/code-editor/table/editableTable";
 
 const TableWithEditorCells = () => {
-  if (typeof window === "undefined") {
-    return <></>;
-  }
-  // const monaco = useMonaco();
+  const monaco = useMonaco();
 
-  // const [languageId, _] = useState(
-  //   `${Math.round(Math.random() * 1000)}_module`
-  // );
+  const [languageId, _] = useState(
+    `${Math.round(Math.random() * 1000)}_module`
+  );
 
-  // // initialize module plugin for monaco instance
-  // useEffect(() => {
-  //   if (!monaco || typeof window !== "undefined") {
-  //     return;
-  //   }
+  // initialize module plugin for monaco instance
+  useEffect(() => {
+    if (!monaco) {
+      return;
+    }
 
-  //   const dispose = moduleIntellisensePlugin(monaco, languageId);
+    const dispose = moduleIntellisensePlugin(monaco, languageId);
 
-  //   return () => {
-  //     dispose();
-  //   };
-  // }, [monaco]);
+    return () => {
+      dispose();
+    };
+  }, [monaco]);
 
-  // return (
-  //   <div>
-  //     <EditableTable
-  //       monaco={monaco}
-  //       languageId={languageId}
-  //       title="Table with DSL cells"
-  //       items={[
-  //         {
-  //           key: `contains("123", "1") == true`,
-  //           value: "does_not_exists",
-  //           isEnabled: true,
-  //         },
-  //         { key: "1 == 1", value: "value2", isEnabled: true },
-  //       ]}
-  //     />
-  //   </div>
-  // );
-  return <></>;
+  return (
+    <div>
+      <EditableTable
+        monaco={monaco}
+        languageId={languageId}
+        title="Table with DSL cells"
+        items={[
+          {
+            key: `contains("123", "1") == true`,
+            value: "does_not_exists",
+            isEnabled: true,
+          },
+          { key: "1 == 1", value: "value2", isEnabled: true },
+        ]}
+      />
+    </div>
+  );
 };
 
-export { TableWithEditorCells };
+export default TableWithEditorCells;

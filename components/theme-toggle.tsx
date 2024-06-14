@@ -23,8 +23,6 @@ export function ThemeToggle() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     setPreference(localStorage.getItem("theme"));
     const current = themeEffect();
 
@@ -34,8 +32,7 @@ export function ThemeToggle() {
 
     setCurrentTheme(current);
 
-    const matchMedia =
-      window && window.matchMedia("(prefers-color-scheme: dark)");
+    const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     matchMedia.addEventListener("change", onMediaChange);
     return () => matchMedia.removeEventListener("change", onMediaChange);
   }, [onMediaChange]);
@@ -58,8 +55,6 @@ export function ThemeToggle() {
   }, [preference]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     window.addEventListener("storage", onStorageChange);
     return () => window.removeEventListener("storage", onStorageChange);
   });

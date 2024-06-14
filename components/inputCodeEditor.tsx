@@ -130,11 +130,6 @@ const EditorSmallInput = ({
   readOnly,
   onChange,
 }: EditorSmallInputProps) => {
-  // if (typeof window === "undefined") {
-  //   console.log("window is undefined");
-  //   return <></>;
-  // }
-
   const [value, setValue] = useState(initialValue);
 
   const [model, setModel] = useState<editor.ITextModel>();

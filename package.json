@@ -6,7 +6,7 @@
     "@fontsource/inter": "^4.5.15",
     "@fontsource/roboto-mono": "^4.5.10",
     "@mdx-js/loader": "^3.0.1",
-    "@mdx-js/react": "^2.3.0",
+    "@mdx-js/react": "^3.0.1",
     "@monaco-editor/react": "^4.6.0",
     "@next/mdx": "^14.2.4",
     "@radix-ui/react-slot": "^1.0.2",
