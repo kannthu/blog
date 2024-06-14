@@ -32,6 +32,7 @@
     "react-tweet": "^3.1.1",
     "react-wrap-balancer": "^0.2.4",
     "react-youtube": "^10.1.0",
+    "sitemap": "^8.0.0",
     "styled-components": "^6.1.11",
     "swr": "^2.1.2",
     "tailwind-merge": "^2.3.0",
