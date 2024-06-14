@@ -1,4 +1,4 @@
-import "./globals.css";
+import "../public/globals.css";
 import "tippy.js/dist/tippy.css";
 
 import { Inter } from "next/font/google";

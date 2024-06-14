@@ -1,4 +1,4 @@
-export const runtime = "edge";
+export const runtime = "experimental-edge";
 
 import links from "@/links.json";
 import { headers } from "next/headers";

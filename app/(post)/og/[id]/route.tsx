@@ -1,7 +1,7 @@
-export const runtime = "edge";
+export const runtime = "experimental-edge";
 
 import { ImageResponse } from "next/og";
-import { getPosts } from "@/app/get-posts";
+import { getPosts } from "@/lib/get-posts";
 
 // fonts
 const inter300 = fetch(

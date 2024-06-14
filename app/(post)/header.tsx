@@ -4,7 +4,7 @@ import { useSelectedLayoutSegments } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { ago } from "time-ago";
 import useSWR from "swr";
-import type { Post } from "@/app/get-posts";
+import type { Post } from "@/lib/get-posts";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
