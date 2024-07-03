@@ -33,7 +33,7 @@ But, let's start from the basics. There are 7 different steps to send a single `
 7. **Parse response** (decode, normalize, and parse the response)
 8. Close the connection (optional)
 
-> Note: any of these steps can fail at any time, so you be prepared to retry it multiple times.
+> Note: any of these steps can fail at any time, so you should be prepared to retry it multiple times.
 
 ## How much time does it take to send a single HTTP request?
 
@@ -59,13 +59,13 @@ In my tests I measured each value 50 times. The size of downloaded body was 40kb
 
 Resolving `DNS` record + opening new `TLS` connection is *really* slow - in an example of calling performant website, my server spent `~160ms` before sending a signle byte of `HTTP` request.
 
-You probably didn't nottice how slow it is, because your browser will open connection once, and reuse it for multiple `HTTP` requests. (in case of `HTTP/2` or `HTTP/3` it is even faster)
+You probably didn't notice how slow it is, because your browser will open connection once, and reuse it for multiple `HTTP` requests. (in case of `HTTP/2` or `HTTP/3` it is even faster)
 
 The good thing is that most of it is just waiting for another server - we are not wasting a lot of CPU cycles. In my case, I want to send many `HTTP/1.1` requests to many different hosts in different networks, so I can't rely on reusing connections.
 
 There is another requirement that I did not mention before - **we do not want to overwhelm any target server.**
 
-We could theretically:
+We could theoretically:
 1. Open `TLS` connection to the server
 2. Send all of the `HTTP/1.1` requests in parallel
 3. Close the connection
@@ -83,7 +83,7 @@ The best candidates are `Request parsing` and `DNS resolution`.
 
 In my case, we do not want to prepare (parse and normalize) the `HTTP/1.1` request at all, the whole thing is used for ethical hacking. We are crafting `HTTP/1.1` requests by hand, we just want a pipe to send it.
 
-For `DNS resolution`, we can resolve all of the `DNS` records before we start sending requests. Performant `DNS` resolution is different bread, that I didn't want to touch it. I just used [`massdns`](https://github.com/blechschmidt/massdns) - it can resolve thousnds of DNS records in a couple of seconds.
+For `DNS resolution`, we can resolve all of the `DNS` records before we start sending requests. Performant `DNS` resolution is different breed, that I didn't want to touch it. I just used [`massdns`](https://github.com/blechschmidt/massdns) - it can resolve thousands of DNS records in a couple of seconds.
 
  This way we can send requests to many servers without waiting for `DNS` resolution.
 
@@ -162,7 +162,7 @@ One simple solution would be to hardcode the keys, but I did not have enough tim
 
 I had **2.5 million** hosts and wanted to send **~200** `HTTP` requests to each host. So I needed to chunk it somehow.
 
-The chanks should be small enough to not take more than a couple of minutes to complete, but big enough to not waste time on creating new connections.
+The chunks should be small enough to not take more than a couple of minutes to complete, but big enough to not waste time on creating new connections.
 
 I decided to split the work into **200** hosts per chunk. Each chunk would be executed by a single worker.
 
@@ -179,11 +179,11 @@ DigitalOcean generously gives you [2TB+ of bandwidth](https://docs.digitalocean.
 
 ### Custom autoscroller
 
-I wrote a simple JS script that would call Kubernetes API to scale the Deployment up and down based on how many targets I had in queue. It scalled from `0` to `60` pods in a couple of minutes.
+I wrote a simple JS script that would call Kubernetes API to scale the Deployment up and down based on how many targets I had in queue. It scaled from `0` to `60` pods in a couple of minutes.
 
 ## DDoS as a Service
 
-I was generating so much traffic that I DDoSed myself - the DigitalOcean's network could not handle my shinanigans.
+I was generating so much traffic that I DDoSed myself - the DigitalOcean's network could not handle my shenanigans.
 
 Each `HTTP cannon` pod was pinging `queue service` to prove that it is still alive, but since I was generating so much traffic, the pings wouldn't be sent at all, and after a couple of minutes kubelet would kill the pod.
 
@@ -197,8 +197,9 @@ So I was sending `HTTP/1.1` requests from different IP addresses at the same tim
 
 ## Conclusion
 
-I was able to acheive a couple of hundret (`100-400`) requests per second from each pod, and I was able to scale it to `60` pods.
-
-I was able to send **500 million** of `HTTP/1.1` requests to **2.5 million** hosts in just a couple of hours.
+The final results were kinda impressive:
+- Each pod achieved 100-400 requests per second
+- Scaled to 60 pods
+- Sent 500 million HTTP/1.1 requests to 2.5 million hosts in just a couple of hours
 
 What was the result? I will tell you in the next post.
