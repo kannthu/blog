@@ -1,0 +1,204 @@
+export const metadata = {
+  title: "How I sent 500 million HTTP requests to 2.5 million hosts",
+  description:
+    "How I sent 500 million HTTP requests to 2.5 million hosts in a couple of hours. Deep dive into HTTP/1.1 and Go.",
+  openGraph: {
+    title: "I sent 500 million HTTP requests to 2.5 million hosts",
+    description:
+      "How I sent 500 million HTTP requests to 2.5 million hosts in a couple of hours. Deep dive into HTTP/1.1 and Go.",
+    images: [
+      {
+        url: "/og/how-i-sent-500-million-http-requests-in-under-24h",
+      },
+    ],
+  },
+};
+
+The answer is *`Go`*.
+
+My usecase was *ethical hacking*, I needed to send **500 million** of non RFC compliant `HTTP/1.1` requests to **2.5 million** hosts in a short period of time - ideally in a couple of hours.
+
+I went deep into the rabbit hole of `HTTP/1.1` and `Go` to optimize the process. I scaled it horizontaly with kubernetes, and optimized the code to use each CPU core as effective as possible. I even edited Go's HTTP library to speed up the process.
+
+I chose `Go` because it is simple, has great concurrency support, and is fast. + My smol Grug brain can understand it.
+
+But, let's start from the basics. There are 7 different steps to send a single `HTTP/1.1` request:
+
+1. **Resolve DNS**
+2. **Establish the TCP connection**
+3. **TLS handshake (generate and exchange cryptographic keys)**
+4. **Parse request** (normalize, encode)
+5. **Send request**
+6. **Receive response**
+7. **Parse response** (decode, normalize, and parse the response)
+8. Close the connection (optional)
+
+> Note: any of these steps can fail at any time, so you be prepared to retry it multiple times.
+
+## How much time does it take to send a single HTTP request?
+
+I know you will hate this, but it *depends*.
+
+There are several factors that might impact the results:
+- distance between you and the server
+- server load
+- internet speed
+- path to the server
+- size of the request
+- size of the response
+
+### Results from my laptop
+
+I measured all of my timings by sending `HTTP/1.1` requests to subdomains of `*.wordpress.com`, my test code was written in JS. (I chose wordpress.com because it has [wildcard dns](https://en.wikipedia.org/wiki/Wildcard_DNS_record), so I can generate random subdomains to prevent any caching)
+
+![HTTP request timings](/images/http-request-timings.png)
+
+In my tests I measured each value 50 times. The size of downloaded body was 40kb, and the HTTP request was a simple GET request.
+
+### What can we learn from it?
+
+Resolving `DNS` record + opening new `TLS` connection is *really* slow - in an example of calling performant website, my server spent `~160ms` before sending a signle byte of `HTTP` request.
+
+You probably didn't nottice how slow it is, because your browser will open connection once, and reuse it for multiple `HTTP` requests. (in case of `HTTP/2` or `HTTP/3` it is even faster)
+
+The good thing is that most of it is just waiting for another server - we are not wasting a lot of CPU cycles. In my case, I want to send many `HTTP/1.1` requests to many different hosts in different networks, so I can't rely on reusing connections.
+
+There is another requirement that I did not mention before - **we do not want to overwhelm any target server.**
+
+We could theretically:
+1. Open `TLS` connection to the server
+2. Send all of the `HTTP/1.1` requests in parallel
+3. Close the connection
+4. Repeat for another server
+
+But we would get rate-limited or banned very quickly.
+
+So, our only option is to spread the load on many servers.
+
+## How can we optimize it?
+
+First, let's think what we can remove from the entire equation. The best part is no part.
+
+The best candidates are `Request parsing` and `DNS resolution`.
+
+In my case, we do not want to prepare (parse and normalize) the `HTTP/1.1` request at all, the whole thing is used for ethical hacking. We are crafting `HTTP/1.1` requests by hand, we just want a pipe to send it.
+
+For `DNS resolution`, we can resolve all of the `DNS` records before we start sending requests. Performant `DNS` resolution is different bread, that I didn't want to touch it. I just used [`massdns`](https://github.com/blechschmidt/massdns) - it can resolve thousnds of DNS records in a couple of seconds.
+
+ This way we can send requests to many servers without waiting for `DNS` resolution.
+
+## Designing the `HTTP/1.1` sending cannon
+
+I like simplicity, so I used multiple worker pools that were piped together.
+
+1. Request generation pool
+2. Sender pool
+3. Response handler pool
+
+![HTTP request timings](/images/cannon-diagram.png)
+
+I wanted to reuse as much objects and memory as possible, so I avoided creating new `objects` and new `goroutines` for each request. Each worker pool was separated by a concurrency safe [`queue`](https://github.com/enriquebris/goconcurrentqueue).
+
+It worked great, each component was separated and could be scaled independently. + It was easy to debug and reason about.
+
+## Choosing right `HTTP` library
+
+I knew that the `net/http` library in `Go` is not the fastest one, so I had to look for alternatives. I ended up with `fasthttp` library, it is a low-level `HTTP` library that is optimized for speed.
+
+> According to the [benchmarks](https://github.com/valyala/fasthttp?tab=readme-ov-file#http-client-comparison-with-nethttp) *fasthttp client is up to 10 times faster than net/http*
+
+I created `n` (number of `HTTP Sender` goroutines) instances of `fasthttp.Client` objects, and each `HTTP Sender` worker was acquiring a client from the pool, sending the request, and releasing it back to the pool.
+
+## Optimizing the library
+
+The library was fast, but I wanted to squeeze every bit of performance from it. I notticed that before sending HTTP request, the library was normalizing each `HTTP` request. It was a waste of CPU cycles, because I was crafting the `HTTP/1.1` requests by hand.
+
+So, I just forked the library and removed the normalization step. It was a simple change, but it saved a lot of CPU cycles.
+
+I also implemented custom `SetRequestRaw` method that would allow me to send raw non RFC complaiant `HTTP/1.1` requests.
+
+In my [version](https://github.com/vidocsecurity/rawfasthttp), I could simply do:
+
+```go
+req := rawfasthttp.AcquireRequest()
+resp := rawfasthttp.AcquireResponse()
+
+rawBytes := []byte("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
+
+req.SetRequestRaw(rawBytes)
+
+err := client.Do(req, resp)
+```
+
+## Skipping DNS resolution
+
+For each request I would just override the `Dial` function and directly connect to the resolved IP address.
+
+```go
+// single instance of custom dialer
+customDialer = &rawfasthttp.TCPDialer{}
+
+req := rawfasthttp.AcquireRequest()
+resp := rawfasthttp.AcquireResponse()
+
+resolved_ip := "127.0.0.1"
+
+req.SetDial(func(addr string) (net.Conn, error) {
+  return customDialer.Dial(resolved_ip)
+})
+
+// ...
+```
+
+## TLS handshake optimization
+
+After profiling the code, I found that the `TLS handshake` had a big waste of CPU cycles. The `TLS` was generating secure cryptographic keys.
+
+Since I am doing hacker things, I do not really care if the keys are secure or not. I just want to send the request as fast as possible.
+
+One simple solution would be to hardcode the keys, but I did not have enough time to implement it. It would require me to do many changes in my fork of `fasthttp` library - so I skipped it for now.
+
+## Splitting the work into chunks
+
+I had **2.5 million** hosts and wanted to send **~200** `HTTP` requests to each host. So I needed to chunk it somehow.
+
+The chanks should be small enough to not take more than a couple of minutes to complete, but big enough to not waste time on creating new connections.
+
+I decided to split the work into **200** hosts per chunk. Each chunk would be executed by a single worker.
+
+The goal would be to send all of the `HTTP/1.1` requests to each host of those **200** hosts, and then move to the next chunk.
+
+Why **200**? It was a number that I found to be optimal for my usecase. The worker pods were prone to fail, so I wanted to minimize the number of requests that would be lost and had to be retried.
+
+## Scalling the cannon with Kubernetes
+
+I used Kubernetes on DigitalOcean to scale the cannon. It wasn't my first choice, but since I was sending terabytes of data to `internet` it was the only cloud that would not require me to sell my kidney to pay for it.
+
+DigitalOcean generously gives you [2TB+ of bandwidth](https://docs.digitalocean.com/platform/billing/bandwidth/) per droplet.
+
+
+### Custom autoscroller
+
+I wrote a simple JS script that would call Kubernetes API to scale the Deployment up and down based on how many targets I had in queue. It scalled from `0` to `60` pods in a couple of minutes.
+
+## DDoS as a Service
+
+I was generating so much traffic that I DDoSed myself - the DigitalOcean's network could not handle my shinanigans.
+
+Each `HTTP cannon` pod was pinging `queue service` to prove that it is still alive, but since I was generating so much traffic, the pings wouldn't be sent at all, and after a couple of minutes kubelet would kill the pod.
+
+It was another reason to decrease the number of hosts per chunk.
+
+## Avoiding detection
+
+Another cool feature of DigitalOcean is that they give you new public IP for each droplet. It was great, because for each scan I would get new IP address.
+
+So I was sending `HTTP/1.1` requests from different IP addresses at the same time, and even when `Cloudflare` would ban me, the next day I would get new IP address.
+
+## Conclusion
+
+I was able to acheive a couple of hundret (`100-400`) requests per second from each pod, and I was able to scale it to `60` pods.
+
+I was able to send **500 million** of `HTTP/1.1` requests to **2.5 million** hosts in just a couple of hours.
+
+What was the result? I will tell you in the next post.

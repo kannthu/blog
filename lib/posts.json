@@ -3,7 +3,12 @@
     {
       "id": "delightful-inputs-with-intellisense-and-syntax-highlighting",
       "date": "June 14, 2024",
-      "title": "Delightful inputs with IntelliSense and Syntax Highlighting for custom DSL in Monaco Editor (React)"
+      "title": "Inputs with IntelliSense and Syntax Highlighting in Monaco Editor (React)"
+    },
+    {
+      "id": "how-i-sent-500-million-http-requests-in-under-24h",
+      "date": "July 4, 2024",
+      "title": "How I sent 500 million HTTP requests to 2.5 million hosts"
     }
   ]
 }

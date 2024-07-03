@@ -30,7 +30,8 @@ export const Code = ({ children, className }) => {
       wrapLines={true}
       customStyle={{
         background: "transparent",
-        padding: "1.5rem 1rem",
+        padding: "0.5rem",
+        margin: "0 0",
       }}
       lineNumberStyle={{
         userSelect: "none",
