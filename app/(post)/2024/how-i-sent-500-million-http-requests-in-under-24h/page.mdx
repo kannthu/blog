@@ -22,15 +22,39 @@ I went deep into the rabbit hole of `HTTP/1.1` and `Go` to optimize the process.
 
 I chose `Go` because it is simple, has great concurrency support, and is fast. + My smol Grug brain can understand it.
 
-But, let's start from the basics. There are 7 different steps to send a single `HTTP/1.1` request:
+Yes, I tried implementing it in Rust, but unfortunately, my brain is too small for async tokio types magic. Go, on the other hand, allowed the JS developer to write this whole thing, this is quite a statement about the language.
 
-1. **Resolve DNS**
-2. **Establish the TCP connection**
-3. **TLS handshake (generate and exchange cryptographic keys)**
-4. **Parse request** (normalize, encode)
-5. **Send request**
-6. **Receive response**
-7. **Parse response** (decode, normalize, and parse the response)
+## How much is **500 million** `HTTP/1.1` requests?
+
+You are probably wondering if it is a lot or not. It is.
+
+If you used `curl` to send all of those requests one by one from single machine it would take you **7.9 years** (assuming 0.5s per request).
+
+In real world it would me much slower, servers would rate limit you, and respond even slower than 0.5s
+
+From data transfer perspective it is not that much:
+- 500 million requests * 1 KB (average request size) ≈ 478 GB
+- 500 million responses * 5 KB (average response size) ≈ 2.33 TB
+
+The problem lies in different place...
+
+## What does it mean to send a single `HTTP/1.1` request?
+
+From your perspective it is just a single call
+```go
+
+resp, err := http.Get("https://example.com")
+```
+
+But under the hood? The HTTP lib is doing a lot of things for you.
+
+1. HTTP client **resolves DNS**
+2. HTTP client **connects to another machine using TCP**
+3. HTTP client **does TLS handshake (generate and exchange cryptographic keys)**
+4. HTTP client **prepares HTTP request to send** (normalize, encode)
+5. HTTP client **sends HTTP request (headers and body)**
+6. HTTP client **waits for response and reads it**
+7. HTTP client **parses response** (decode, normalize, and parse the response)
 8. Close the connection (optional)
 
 > Note: any of these steps can fail at any time, so you should be prepared to retry it multiple times.
