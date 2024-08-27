@@ -1,3 +1,17 @@
+### 🚀 We are hiring
+
+**Founding Backend Engineer**
+
+Here is what you will do:
+
+- Build state-of-the art code scanning tools (based on LLMs)
+- Integrate LLMs and build RAG pipelines
+- Build parsers to represent code as graph
+- Optimize scanning pipeline to work near realtime
+- Scale to millions of snippets of code
+
+Contact me at **ZGF3aWRAdmlkb2NzZWN1cml0eS5jb20=** (figure it out yourself)
+
 # blog
 
 This is the blog that powers `moczadlo.com`, built on

@@ -14,9 +14,9 @@ export const metadata = {
   },
 };
 
-The answer is *`Go`*.
+The answer is _`Go`_.
 
-My usecase was *ethical hacking*, I needed to send **500 million** of non RFC compliant `HTTP/1.1` requests to **2.5 million** hosts in a short period of time - ideally in a couple of hours.
+My usecase was _ethical hacking_, I needed to send **500 million** of non RFC compliant `HTTP/1.1` requests to **2.5 million** hosts in a short period of time - ideally in a couple of hours.
 
 I went deep into the rabbit hole of `HTTP/1.1` and `Go` to optimize the process. I scaled it horizontaly with kubernetes, and optimized the code to use each CPU core as effective as possible. I even edited Go's HTTP library to speed up the process.
 
@@ -33,14 +33,16 @@ If you used `curl` to send all of those requests one by one from single machine 
 In real world it would me much slower, servers would rate limit you, and respond even slower than 0.5s
 
 From data transfer perspective it is not that much:
-- 500 million requests * 1 KB (average request size) ≈ 478 GB
-- 500 million responses * 5 KB (average response size) ≈ 2.33 TB
+
+- 500 million requests \* 1 KB (average request size) ≈ 478 GB
+- 500 million responses \* 5 KB (average response size) ≈ 2.33 TB
 
 The problem lies in different place...
 
 ## What does it mean to send a single `HTTP/1.1` request?
 
 From your perspective it is just a single call
+
 ```go
 
 resp, err := http.Get("https://example.com")
@@ -61,9 +63,10 @@ But under the hood? The HTTP lib is doing a lot of things for you.
 
 ## How much time does it take to send a single HTTP request?
 
-I know you will hate this, but it *depends*.
+I know you will hate this, but it _depends_.
 
 There are several factors that might impact the results:
+
 - distance between you and the server
 - server load
 - internet speed
@@ -81,7 +84,7 @@ In my tests I measured each value 50 times. The size of downloaded body was 40kb
 
 ### What can we learn from it?
 
-Resolving `DNS` record + opening new `TLS` connection is *really* slow - in an example of calling performant website, my server spent `~160ms` before sending a signle byte of `HTTP` request.
+Resolving `DNS` record + opening new `TLS` connection is _really_ slow - in an example of calling performant website, my server spent `~160ms` before sending a signle byte of `HTTP` request.
 
 You probably didn't notice how slow it is, because your browser will open connection once, and reuse it for multiple `HTTP` requests. (in case of `HTTP/2` or `HTTP/3` it is even faster)
 
@@ -90,6 +93,7 @@ The good thing is that most of it is just waiting for another server - we are no
 There is another requirement that I did not mention before - **we do not want to overwhelm any target server.**
 
 We could theoretically:
+
 1. Open `TLS` connection to the server
 2. Send all of the `HTTP/1.1` requests in parallel
 3. Close the connection
@@ -109,7 +113,7 @@ In my case, we do not want to prepare (parse and normalize) the `HTTP/1.1` reque
 
 For `DNS resolution`, we can resolve all of the `DNS` records before we start sending requests. Performant `DNS` resolution is different breed, that I didn't want to touch it. I just used [`massdns`](https://github.com/blechschmidt/massdns) - it can resolve thousands of DNS records in a couple of seconds.
 
- This way we can send requests to many servers without waiting for `DNS` resolution.
+This way we can send requests to many servers without waiting for `DNS` resolution.
 
 ## Designing the `HTTP/1.1` sending cannon
 
@@ -129,7 +133,7 @@ It worked great, each component was separated and could be scaled independently.
 
 I knew that the `net/http` library in `Go` is not the fastest one, so I had to look for alternatives. I ended up with `fasthttp` library, it is a low-level `HTTP` library that is optimized for speed.
 
-> According to the [benchmarks](https://github.com/valyala/fasthttp?tab=readme-ov-file#http-client-comparison-with-nethttp) *fasthttp client is up to 10 times faster than net/http*
+> According to the [benchmarks](https://github.com/valyala/fasthttp?tab=readme-ov-file#http-client-comparison-with-nethttp) _fasthttp client is up to 10 times faster than net/http_
 
 I created `n` (number of `HTTP Sender` goroutines) instances of `fasthttp.Client` objects, and each `HTTP Sender` worker was acquiring a client from the pool, sending the request, and releasing it back to the pool.
 
@@ -200,7 +204,6 @@ I used Kubernetes on DigitalOcean to scale the cannon. It wasn't my first choice
 
 DigitalOcean generously gives you [2TB+ of bandwidth](https://docs.digitalocean.com/platform/billing/bandwidth/) per droplet.
 
-
 ### Custom autoscroller
 
 I wrote a simple JS script that would call Kubernetes API to scale the Deployment up and down based on how many targets I had in queue. It scaled from `0` to `60` pods in a couple of minutes.
@@ -222,8 +225,27 @@ So I was sending `HTTP/1.1` requests from different IP addresses at the same tim
 ## Conclusion
 
 The final results were kinda impressive:
+
 - Each pod achieved 100-400 requests per second
 - Scaled to 60 pods
 - Sent 500 million HTTP/1.1 requests to 2.5 million hosts in just a couple of hours
 
 What was the result? I will tell you in the next post.
+
+### 🚀 We are hiring
+
+<Callout>
+
+**Founding Backend Engineer**
+
+Here is what you will do:
+
+- Build state-of-the art code scanning tools (based on LLMs)
+- Integrate LLMs and build RAG pipelines
+- Build parsers to represent code as graph
+- Optimize scanning pipeline to work near realtime
+- Scale to millions of snippets of code
+
+Contact me at **ZGF3aWRAdmlkb2NzZWN1cml0eS5jb20=** (figure it out yourself)
+
+</Callout>

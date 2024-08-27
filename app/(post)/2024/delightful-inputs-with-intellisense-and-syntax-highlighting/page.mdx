@@ -1,9 +1,11 @@
 export const metadata = {
-  title: "Inputs with IntelliSense and Syntax Highlighting in Monaco Editor (React)",
+  title:
+    "Inputs with IntelliSense and Syntax Highlighting in Monaco Editor (React)",
   description:
     "Building IntelliSense and Syntax Highlighting for custom DSL in Monaco Editor (React)",
   openGraph: {
-    title: "Inputs with IntelliSense and Syntax Highlighting in Monaco Editor (React)",
+    title:
+      "Inputs with IntelliSense and Syntax Highlighting in Monaco Editor (React)",
     description:
       "Building IntelliSense and Syntax Highlighting for custom DSL in Monaco Editor (React)",
     images: [
@@ -24,6 +26,7 @@ You thought it is a good idea to make your users learn new syntax just to use yo
 This blog is a summary of my efforts to unfuck the experience for my users. You can flatten the learning curve of DSL by introducing some **technical debt**. It is not a solution, it is a tradeof.
 
 It was built using:
+
 - [`@monaco-editor/react`](https://www.npmjs.com/package/@monaco-editor/react)
 - [monaco-editor](https://www.npmjs.com/package/monaco-editor)
 - React
@@ -32,15 +35,15 @@ If you hate technical debt and hacky solutions, do not read it.
 
 # What you can expect
 
-<WithCaption caption={
-  <>
-    Example of hovers, completions and validation of custom DSL
-  </>
-}>
+<WithCaption
+  caption={<>Example of hovers, completions and validation of custom DSL</>}
+>
   <div className="flex flex-col px-4 mt-3 py-3 bg-gradient-to-b from-blue-100 via-pink-100 to-blue-50 rounded-lg justify-center align-middle items-center w-full min-h-40">
     <div className="w-full max-w-[550px]">
       <span className="mb-2 dark:text-gray-800">Playground input</span>
-      <CustomDSLInput input={`base64("edit_me2") == 1 && contains(BasePath, "foo")`} />
+      <CustomDSLInput
+        input={`base64("edit_me2") == 1 && contains(BasePath, "foo")`}
+      />
     </div>
   </div>
 </WithCaption>
@@ -87,11 +90,11 @@ Monaco editor can be rendered as a single input element, without sacrificing any
         />
       </div>
 
-
       <div>
         <TableWithEditorCells />
       </div>
     </div>
+
   </div>
 </WithCaption>
 
@@ -102,6 +105,7 @@ The big problem is that we do not want to write LSP (Language Server) for our DS
 The solution is to use expression evaluator for your DSL that will try evaluating the expression with stubs and return errors if something is wrong. You can even implement type checks for my DSL! In my case the evaluator is written in Go and I had to compile it to Javascript using [gopherjs](https://github.com/gopherjs/gopherjs). So it is better to have it in JS or TS.
 
 ## Pseudo code
+
 Each time user changes the input, we evaluate the expression and display the errors as markers in the editor. **It is not a LSP, but for this case it approximates the experience**.
 
 ```javascript
@@ -114,7 +118,7 @@ const stubVariables = {
   Hostname: "string",
   Time: "number",
   // ...
-}
+};
 
 const stubFunctions = {
   md5: validate("md5", ["string"], "string"),
@@ -124,13 +128,10 @@ const stubFunctions = {
   contains: validate("contains", ["string", "string"], true),
 };
 
-const errors = evaluateExpression(
-  expr,
-  {
-    ...stubVariables,
-    ...stubFunctions
-  }
-);
+const errors = evaluateExpression(expr, {
+  ...stubVariables,
+  ...stubFunctions,
+});
 ```
 
 `validate` is higher order function that returns a function that will validate the arguments and return the result.
@@ -140,9 +141,11 @@ const errors = evaluateExpression(
 You can just copy-paste the [source code](https://github.com/kannthu/blog/blob/42c1532a22a77beff70417db2ef39df711c643ec/components/inputCodeEditor.tsx#L123) and it will work. It is not perfect, but it is a good start.
 
 Caveats:
+
 - Hovers do not work on mobile
 
 Example usage:
+
 ```tsx
 import { useMonaco } from "@monaco-editor/react";
 import { EditorSmallInput } from "...";
@@ -160,13 +163,14 @@ const Component = () => {
       placeholder="Hello, I am your placeholder!"
       value={"initial_value_here"}
     />
-  )
-}
+  );
+};
 ```
 
 My code is not limited to single line inputs, it can be extended to multi-line inputs as well.
 
 You can change the number of lines by changing the constant in the [code](https://github.com/kannthu/blog/blob/42c1532a22a77beff70417db2ef39df711c643ec/components/inputCodeEditor.tsx#L120).
+
 ```typescript
 // ...
 const MAX_LINES = 1;
@@ -184,3 +188,21 @@ It has set of completions, hovers and validations. You can edit it to fit your n
 I hope this article will help you to make your DSL more user friendly. It is not a perfect solution, but it works.
 
 If you would like to see more examples or have any questions, feel free to reach out to me at [@kannthu1](https://x.com/kannthu1).
+
+### 🚀 We are hiring
+
+<Callout>
+
+**Founding Backend Engineer**
+
+Here is what you will do:
+
+- Build state-of-the art code scanning tools (based on LLMs)
+- Integrate LLMs and build RAG pipelines
+- Build parsers to represent code as graph
+- Optimize scanning pipeline to work near realtime
+- Scale to millions of snippets of code
+
+Contact me at **ZGF3aWRAdmlkb2NzZWN1cml0eS5jb20=** (figure it out yourself)
+
+</Callout>
