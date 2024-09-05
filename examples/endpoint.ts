@@ -15,6 +15,13 @@ export default async function handler(
       return res.status(400).json({ error: "User ID is required" });
     }
 
+    // Assume req.userId contains the authenticated user's ID
+    const authenticatedUserId = req.userId;
+
+    if (authenticatedUserId !== id) {
+      return res.status(403).json({ error: "Forbidden: You are not authorized to update this profile" });
+    }
+
     try {
       const updatedUser = await prisma.user.update({
         where: { id },
