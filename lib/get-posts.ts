@@ -23,8 +23,12 @@ export const getPosts = async () => {
       viewsFormatted: "0",
     }));
   }
+  let allViews: null | Views = {};
 
-  const allViews: null | Views = await redis.hgetall("views");
+  try {
+    allViews = await redis.hgetall("views");
+  } catch {}
+
   const posts = postsData.posts.map((post): Post => {
     const views = Number(allViews?.[post.id] ?? 0);
     return {

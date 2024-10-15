@@ -30,13 +30,17 @@ async function getAndCacheTweet(id: string): Promise<TweetV | undefined> {
     console.error("tweet fetch error", error);
   }
 
-  const cachedTweet: TweetV | null = await redis.get(`tweet:${id}`);
+  try {
+    const cachedTweet: TweetV | null = await redis.get(`tweet:${id}`);
 
-  // @ts-ignore
-  if (!cachedTweet || cachedTweet.tombstone) return undefined;
-  console.log("tweet cache hit", id);
+    // @ts-ignore
+    if (!cachedTweet || cachedTweet.tombstone) return undefined;
+    console.log("tweet cache hit", id);
 
-  return cachedTweet;
+    return cachedTweet;
+  } catch (error) {
+    return;
+  }
 }
 
 const TweetContent = async ({ id, components }: TweetProps) => {
